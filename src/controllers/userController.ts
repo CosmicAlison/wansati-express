@@ -1,77 +1,28 @@
 import { Request, Response } from 'express';
-import { User } from '../models/User';
 import { UserService } from '../services/userService';
 import { sendResponse } from '../utils/sendResponse';
 
-interface CreateUserRequest extends Express.Request {
-    body: {
-        name: string;
-        email: string;
-        password: string;
-        [key: string]: any;
-    };
+interface GetUserByIdParams {
+  id: string;
 }
 
-interface CreateUserResponse extends Express.Response {
-    sendResponse: (status: number, data: any, message: string) => void;
-}
+export class UserController {
+  static async getUsers(req: Request, res: Response): Promise<void> {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
 
-interface GetUserByIdRequest extends Express.Request {
-    body: {
-        email: string;
-    };
-}
+    const users = await UserService.getUsers(page, limit);
+    sendResponse({res, statusCode : 200, data : users, message : 'Users retrieved successfully'});
+  }
 
-interface GetUserByIdResponse extends Express.Response {
-    sendResponse: (user: User) => void;
-}
+  static async getUserById(req: Request<GetUserByIdParams>, res: Response): Promise<void> {
+    const userId = parseInt(req.params.id, 10);
+    const user = await UserService.getUserById(userId);
 
-interface CreateUserResponse extends Express.Response {
-    sendResponse: (status: number, data: any, message: string) => void;
-}
-
-interface UserExistsError extends Error {
-    code: string;
-    message: string;
-}
-
-class UserController {
-    static async createUser(
-        req: CreateUserRequest,
-        res: CreateUserResponse
-    ): Promise<void> {
-        try {
-            const userData = req.body;
-            const user: User = await UserService.createUser(userData);
-
-            res.sendResponse(201, user, 'User created successfully');
-        } catch (error) {
-            if ((error as UserExistsError).code === 'USER_EXISTS') {
-                return res.sendResponse(409, null, (error as UserExistsError).message);
-            }
-            throw error;
-        }
+    if (!user) {
+      return sendResponse({res, statusCode : 404, data : null, message : 'User not found'});
     }
 
-    static async getUsers(
-        req: Request, 
-        res: Response) {
-        const { page = 1, limit = 10 } = req.query;
-        const users = await UserService.getUsers(page, limit);
-
-        res.sendResponse(200, users, 'Users retrieved successfully');
-    }
-
-    static async getUserById(
-        req: GetUserByIdRequest, 
-        res: GetUserByIdResponse
-    ): Promise<void> {
-        const user = await UserService.getUserById(req.params.id);
-
-        if (!user) {
-            return res.sendResponse(404, null, 'User not found');
-        }
-
-        res.sendResponse(200, user, 'User retrieved successfully');
-    }
+    sendResponse({res, statusCode : 200, data : user, message : 'User retrieved successfully'});
+  }
 }
