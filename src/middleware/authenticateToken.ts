@@ -2,11 +2,9 @@ import { sendResponse } from "../utils/sendResponse";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 
-declare global {
-  namespace Express {
-    interface Request {
-      userId?: number; 
-    }
+declare module 'express-serve-static-core' {
+  interface Request {
+    user?: any; // Or define a specific type for your user object
   }
 }
 
@@ -26,7 +24,10 @@ const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
     if (!decoded.id) {
       return sendResponse({ res, statusCode: 403, data: null, message: "Invalid token" });
     }
-    req.userId = decoded.id;
+    if(!req.user) {
+      req.user = { id: decoded.id, email: decoded.email as string };
+    }
+    req.user.id = decoded.id;
     next();
   } catch (err) {
     return sendResponse({ res, statusCode: 403, data: null, message: "Invalid token" });

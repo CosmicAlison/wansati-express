@@ -64,23 +64,24 @@ export class MatchService {
     }
   }
 
-  static async getPotentialMatches(userId: number) {
+static async getPotentialMatches(userId: number) {
   try {
     const potentialMatches = await sql`
-      SELECT *
-      FROM users
-      WHERE id != ${userId}
-        AND id NOT IN (
-          SELECT matched_user_id FROM user_matches WHERE user_id = ${userId}
-          UNION
-          SELECT user_id FROM matches WHERE matched_user_id = ${userId}
-        )
+      SELECT u.*
+      FROM users u
+      WHERE u.id != ${userId}
+      AND NOT EXISTS (
+        SELECT 1
+        FROM user_matches m
+        WHERE (m.user_id = ${userId} AND m.matched_user_id = u.id)
+           OR (m.user_id = u.id AND m.matched_user_id = ${userId})
+      )
     `;
-    return potentialMatches;
-    } catch (err) {
-        console.error("Error fetching potential matches:", err);
-        throw new Error("Failed to fetch potential matches");
-    }
-    }
+    console.log(potentialMatches);
+  } catch (err) {
+    console.error("Error fetching potential matches:", err);
+    throw new Error("Failed to fetch potential matches");
+  }
+}
 
 }

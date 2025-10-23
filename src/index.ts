@@ -33,14 +33,7 @@ connect();
 
 // Routes
 app.use('/auth', authRoutes);
-app.use("/api/matches", matchRoutes);
-
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-    credentials: true,
-  })
-);
+app.use("/matches", matchRoutes);
 
 // Health check
 app.get('/', (req: Request, res: Response) => {

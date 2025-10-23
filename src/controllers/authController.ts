@@ -47,7 +47,6 @@ export class AuthController {
   static async login(req: Request<{}, {}, LoginBody>, res: Response) {
     try {
       const { email, password } = req.body;
-      console.log("Login attempt for email:", req.body);
       const user = await UserService.getUserByEmail(email);
 
       if (!user) {
