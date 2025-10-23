@@ -25,3 +25,5 @@ const gracefulShutdown = (signal: GracefulShutdownOptions['signal'], server: Gra
         process.exit(1);
     }, 30000);
 };
+
+export { gracefulShutdown };
