@@ -14,7 +14,7 @@ import { sendResponse } from './utils/sendResponse';
 dotenv.config();
 
 const app: Application = express();
-const PORT = Number(process.env.PORT) || 4000;
+const PORT = Number(process.env.PORT) || 8080;
 
 // Middleware
 app.use(express.json());
