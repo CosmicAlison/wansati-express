@@ -13,10 +13,10 @@ function connect(): Sql {
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) throw new Error('DATABASE_URL is not set');
 
-  const sslDisabled = (process.env.PGSSLMODE || '').toLowerCase() === 'disable' || process.env.PGSSLMODE === '0';
-  const ssl = sslDisabled ? false : { rejectUnauthorized: false };
+  const ssl = "require";
 
   sql = postgres(databaseUrl, {
+    debug: (conn, query, params) => console.log(query),
     ssl,
     max: process.env.PG_MAX_CLIENTS ? Number(process.env.PG_MAX_CLIENTS) : 5,
   });
