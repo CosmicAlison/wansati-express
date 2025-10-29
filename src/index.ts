@@ -14,7 +14,7 @@ import { sendResponse } from './utils/sendResponse';
 dotenv.config();
 
 const app: Application = express();
-const PORT = process.env.PORT || 4000;
+const PORT = Number(process.env.PORT) || 8080;
 
 // Middleware
 app.use(express.json());
@@ -46,7 +46,7 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 // Start server
-const server: Server = app.listen(PORT, () => {
+const server: Server = app.listen(PORT, '0.0.0.0',  () => {
   console.log(`🚀 Auth service running on port ${PORT}`);
 });
 
